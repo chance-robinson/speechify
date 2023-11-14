@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import AudioRecorder from './AudioFile';
-import FillerWordsHighlighter from './FillerWordsHighlighter';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import AudioRecorder from "./AudioFile";
+import FillerWordsHighlighter from "./FillerWordsHighlighter";
+import "./App.css";
 
 function App() {
   // State to store the max recording duration, prompt, transcriptions, and confidences
@@ -9,19 +9,19 @@ function App() {
   const [useMaxDuration, setUseMaxDuration] = useState(false);
   const [prompt, setPrompt] = useState(() => {
     // Initialize with the value from local storage, or an empty string if not present
-    const storedPrompt = localStorage.getItem('prompt');
-    return storedPrompt ? storedPrompt : '';
+    const storedPrompt = localStorage.getItem("prompt");
+    return storedPrompt ? storedPrompt : "";
   });
   const [transcriptions, setTranscriptions] = useState([]);
   const [confidences, setConfidences] = useState([]);
 
   const clearPrompt = () => {
-    setPrompt('');
+    setPrompt("");
   };
 
   useEffect(() => {
     // Save the current prompt value to local storage
-    localStorage.setItem('prompt', prompt);
+    localStorage.setItem("prompt", prompt);
   }, [prompt]);
 
   const calculateRows = (text) => {
@@ -31,9 +31,9 @@ function App() {
   };
 
   return (
-    <div className='home'>
+    <div className="home">
       <div className="container">
-      <div className="duration-container">
+        <div className="duration-container">
           <label className="duration-label">
             Max Recording Duration (seconds):
             <input
@@ -54,17 +54,30 @@ function App() {
           </label>
         </div>
         <AudioRecorder
-          maxRecordingDuration={useMaxDuration ? maxDuration * 1000 + 100 : Infinity}
+          maxRecordingDuration={
+            useMaxDuration ? maxDuration * 1000 + 100 : Infinity
+          }
           setTranscriptions={setTranscriptions}
           setConfidences={setConfidences}
           infinitePlay={!useMaxDuration}
         />
         <div className="prompt-container">
           <label className="prompt-label">
-            <div className='prompt-header' style={{display: 'flex', justifyContent: 'space-between', marginTop: '1rem', marginBottom: '1rem'}}>
-
-            <p>Prompts:</p>
-            <button onClick={clearPrompt} style={{ marginLeft: '10px' }} disabled={!prompt}>
+            <div
+              className="prompt-header"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "1rem",
+                marginBottom: "1rem",
+              }}
+            >
+              <p>Prompts:</p>
+              <button
+                onClick={clearPrompt}
+                style={{ marginLeft: "10px" }}
+                disabled={!prompt}
+              >
                 Clear Prompts
               </button>
             </div>
@@ -78,9 +91,32 @@ function App() {
             />
           </label>
         </div>
+        <div className="bottom-container">
+        <div className="known-issues">
+          <p>Known issues:</p>
+          <ul>
+            <li>
+              user-defined filler words containing single-letter words will get
+              caught in sentences 'i' 'a' any partial word, need to make exact.
+            </li>
+            <li>awkward button styling on clear prompts if hovering</li>
+            <li>need word break on user-defined filler words</li>
+          </ul>
+        </div>
+        <div className="future-additions">
+          <p>Will add:</p>
+          <ul>
+            <li>light/dark theme</li>
+            <li>time stamps for each sentence (start/stop)</li>
+          </ul>
+        </div>
       </div>
-      <div className='container'>
-        <FillerWordsHighlighter transcriptions={transcriptions} confidences={confidences} />
+      </div>
+      <div className="container">
+        <FillerWordsHighlighter
+          transcriptions={transcriptions}
+          confidences={confidences}
+        />
       </div>
     </div>
   );
