@@ -1,39 +1,74 @@
-// App.jsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AudioRecorder from './AudioFile';
+import FillerWordsHighlighter from './FillerWordsHighlighter';
 import './App.css';
 
 function App() {
-  // State to store the max recording duration
+  // State to store the max recording duration, prompt, transcriptions, and confidences
   const [maxDuration, setMaxDuration] = useState(60); // Default to 60 seconds, for example
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState(() => {
+    // Initialize with the value from local storage, or an empty string if not present
+    const storedPrompt = localStorage.getItem('prompt');
+    return storedPrompt ? storedPrompt : '';
+  });
+  const [transcriptions, setTranscriptions] = useState([]);
+  const [confidences, setConfidences] = useState([]);
+
+  const clearPrompt = () => {
+    setPrompt('');
+  };
+
+  useEffect(() => {
+    // Save the current prompt value to local storage
+    localStorage.setItem('prompt', prompt);
+  }, [prompt]);
+
+  const calculateRows = (text) => {
+    // Calculate the number of rows based on the content
+    const lineCount = (text.match(/\n/g) || []).length + 1;
+    return Math.min(Math.max(lineCount, 4)); // Adjust as needed
+  };
 
   return (
-    <div className="container">
-      <div className="prompt-container">
-        <label className="prompt-label">
-          Prompt:
-          <textarea
-            className="prompt-textarea"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            rows={4}
-          />
-        </label>
+    <div className='home'>
+      <div className="container">
+        <div className="duration-container">
+          <label className="duration-label">
+            Max Recording Duration (seconds):
+            <input
+              className="duration-input"
+              type="number"
+              value={maxDuration}
+              onChange={(e) => setMaxDuration(parseInt(e.target.value, 10))}
+            />
+          </label>
+        </div>
+        <AudioRecorder
+          maxRecordingDuration={maxDuration * 1000 + 100}
+          setTranscriptions={setTranscriptions}
+          setConfidences={setConfidences}
+        />
+        <div className="prompt-container">
+          <label className="prompt-label">
+            <div className='prompt-header' style={{display: 'flex', justifyContent: 'space-between'}}>
+
+            <p>Prompt (For reminder):</p>
+            <button onClick={clearPrompt} style={{ marginLeft: '10px' }}>
+                Clear Prompts
+              </button>
+            </div>
+            <textarea
+              className="prompt-textarea"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              rows={calculateRows(prompt)}
+            />
+          </label>
+        </div>
       </div>
-      <div className="duration-container">
-        <label className="duration-label">
-          Max Recording Duration (seconds):
-          <input
-            className="duration-input"
-            type="number"
-            value={maxDuration}
-            onChange={(e) => setMaxDuration(parseInt(e.target.value, 10))}
-          />
-        </label>
+      <div className='container'>
+        <FillerWordsHighlighter transcriptions={transcriptions} confidences={confidences} />
       </div>
-      <AudioRecorder maxRecordingDuration={maxDuration * 1000 + 100} />
     </div>
   );
 }

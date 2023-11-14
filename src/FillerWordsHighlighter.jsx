@@ -1,53 +1,106 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-const FillerWordsHighlighter = ({ transcription, confidence }) => {
-  const [highlightedTranscription, setHighlightedTranscription] = useState('');
-  const [fillerScore, setFillerScore] = useState(0);
-  const [userDefinedFillerWords, setUserDefinedFillerWords] = useState('okay');
+const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
+  const [highlightedTranscriptions, setHighlightedTranscriptions] = useState([]);
+  const [fillerScores, setFillerScores] = useState([]);
+  const [userDefinedFillerWords, setUserDefinedFillerWords] = useState(() => {
+    // Initialize with the value from local storage, or a default value if not present
+    const storedValue = localStorage.getItem("userDefinedFillerWords");
+    return storedValue ? storedValue : "okay";
+  });
 
   useEffect(() => {
-    highlightFillerWords(transcription);
-    calculateFillerScore(transcription);
-  }, [transcription, userDefinedFillerWords]);
+    highlightFillerWords(transcriptions);
+    calculateFillerScores(transcriptions);
+  }, [transcriptions, userDefinedFillerWords]);
 
-  const highlightFillerWords = (transcription) => {
-    const words = transcription.split(/\s+/);
+  const highlightFillerWords = (transcriptions) => {
+    const highlightedTexts = transcriptions.map((transcription) => {
+      const words = transcription.split(/\s+/);
 
-    const highlightedText = words
-      .map((word) => (userDefinedFillerWords.includes(word.toLowerCase()) ? `<span style="color: red;">${word}</span>` : word))
-      .join(' ');
+      return words.map((word) =>
+        userDefinedFillerWords.includes(word.toLowerCase()) ? (
+          <span key={word} style={{ color: "red", fontWeight: "bold" }}>
+            {word}&nbsp;
+          </span>
+        ) : (
+          <span key={word}>{word}&nbsp;</span>
+        )
+      );
+    });
 
-    setHighlightedTranscription(highlightedText);
+    setHighlightedTranscriptions(highlightedTexts);
   };
 
-  const calculateFillerScore = (transcription) => {
-    const words = transcription.split(/\s+/);
-    const totalWords = words.length;
-    const fillerCount = words.filter((word) => userDefinedFillerWords.includes(word.toLowerCase())).length;
+  const calculateFillerScores = (transcriptions) => {
+    const scores = transcriptions.map((transcription) => {
+      const words = transcription.split(/\s+/);
+      const totalWords = words.length;
+      const fillerCount = words.filter((word) =>
+        userDefinedFillerWords.includes(word.toLowerCase())
+      ).length;
 
-    const score = 100 - (fillerCount / totalWords) * 100;
-    setFillerScore(score.toFixed(2));
+      return 100 - (fillerCount / totalWords) * 100;
+    });
+
+    setFillerScores(scores.map((score) => score.toFixed(2)));
   };
 
   const handleUserDefinedFillerWordsChange = (event) => {
-    setUserDefinedFillerWords(event.target.value);
+    const newValue = event.target.value;
+    setUserDefinedFillerWords(newValue);
+    localStorage.setItem("userDefinedFillerWords", newValue); // Save to local storage
   };
 
   return (
-    <div style={{width: '100%'}}>
-      <label style={{display: 'flex', flexDirection:'column'}}>
-        User-Defined Filler Words (seperate on space or comma):
+    <div style={{ width: "100%" }}>
+      <label
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          marginBottom: "10px",
+        }}
+      >
+        User-Defined Filler Words (separate on space or comma):
         <input
           type="text"
           value={userDefinedFillerWords}
           onChange={handleUserDefinedFillerWordsChange}
         />
       </label>
-      <div>
-        <p dangerouslySetInnerHTML={{ __html: highlightedTranscription }} />
-        <p>Score: {fillerScore}%</p>
-        <p>Confidence (less than 90% means you REALLY need to enunciate better and it can skew the transcription): {confidence.toFixed(4)*100}%</p>
-      </div>
+      <p>
+        Notes: A confidence score of less than 90 or around there indicates poor
+        speech patterns such as mumbling/poor enunciation/etc... and will skew
+        the transcription.
+      </p>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr style={{ borderBottom: "2px solid #333" }}>
+            <th style={{ padding: "10px", textAlign: "left", width: "80%" }}>
+              Sentence
+            </th>
+            <th style={{ padding: "10px", textAlign: "left", width: "10%" }}>
+              Score
+            </th>
+            <th style={{ padding: "10px", textAlign: "left", width: "10%" }}>
+              Confidence
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {transcriptions.map((_, index) => (
+            <tr key={index} style={{ borderBottom: "1px solid #ccc" }}>
+              <td style={{ padding: "10px" }}>
+                {highlightedTranscriptions[index]}
+              </td>
+              <td style={{ padding: "10px" }}>{fillerScores[index]}%</td>
+              <td style={{ padding: "10px" }}>
+                {confidences[index].toFixed(4) * 100}%
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

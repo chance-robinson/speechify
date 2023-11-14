@@ -5,14 +5,17 @@ body {
   font-family: 'Arial', sans-serif;
 }
 
+
+.home {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 70%;
-  margin: 0 auto;
+  width: 50%;
 }
 
 .prompt-container {
@@ -23,13 +26,11 @@ body {
 .prompt-label {
   display: flex;
   flex-direction: column;
-  font-size: 1.2em;
   margin-bottom: 5px;
 }
 
 .prompt-textarea {
-  width: 100%;
-  padding: 10px;
+  max-width: 100%;
   font-size: 1em;
 }
 

@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import FillerWordsHighlighter from './FillerWordsHighlighter';  // Import the FillerWordsHighlighter component
 import "./AudioFile.css";
 
-const AudioRecorder = ({ maxRecordingDuration }) => {
+const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioURL, setAudioURL] = useState("");
@@ -11,15 +10,13 @@ const AudioRecorder = ({ maxRecordingDuration }) => {
   const mediaRecorderRef = useRef(null);
   const audioRef = useRef();
   const recordingTimerRef = useRef(null);
-  const [transcription, setTranscription] = useState("");
   const recognitionRef = useRef(null);
-  const [confidence, setConfidence] = useState(0);
 
   const clearContentHandler = () => {
-    setTranscription("");
+    setTranscriptions([]);
+    setConfidences([]);
     setAudioURL("");
     setIsPlaying(false);
-    setConfidence(0);
   };
 
   useEffect(() => {
@@ -39,23 +36,16 @@ const AudioRecorder = ({ maxRecordingDuration }) => {
   }, [isRecording, recordingDuration, maxRecordingDuration]);
 
   const startRecording = () => {
+    clearContentHandler();
     const recognition = new window.webkitSpeechRecognition();
     recognition.continuous = true;
 
-    recognition.onstart = () => {
-      setIsRecording(true);
-    };
-
-    recognition.onend = () => {
-      setIsRecording(false);
-    };
-
     recognition.onresult = (event) => {
-      console.log(event)
-      const transcript = event.results[0][0].transcript;
-      const conf = event.results[0][0].confidence;
-      setTranscription(transcript);
-      setConfidence(conf);
+      const lastIndex = event.results.length - 1;
+      const transcript = event.results[lastIndex][0].transcript;
+      const conf = event.results[lastIndex][0].confidence;
+      setTranscriptions((prevTranscriptions) => [...prevTranscriptions, transcript]);
+      setConfidences((prevConfidences) => [...prevConfidences, conf]);
     };
 
 
@@ -170,9 +160,6 @@ const AudioRecorder = ({ maxRecordingDuration }) => {
         <button onClick={clearContentHandler}>
           Clear
         </button>
-      </div>
-      <div>
-        <FillerWordsHighlighter transcription={transcription} confidence={confidence} />
       </div>
     </div>
   );
