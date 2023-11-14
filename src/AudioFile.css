@@ -1,0 +1,12 @@
+.audiocontainer {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    width: 100%;
+}
+
+.recording-duration {
+    height: 1.5em; /* Set a fixed height for the recording duration message */
+  }
