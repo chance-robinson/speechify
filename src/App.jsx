@@ -99,10 +99,6 @@ function App() {
         <div>
           <p>Known issues:</p>
           <ul>
-            <li>
-              user-defined filler words containing single-letter words will get
-              caught in sentences 'i' 'a' any partial word, need to make exact.
-            </li>
             <li>awkward button styling on clear prompts if hovering</li>
             <li>need word break on user-defined filler words</li>
             <li>no form id's</li>

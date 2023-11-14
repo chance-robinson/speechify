@@ -19,18 +19,20 @@ const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
   }, [transcriptions, userDefinedFillerWords]);
 
   const highlightFillerWords = (transcriptions) => {
+    const fillerWordsArray = userDefinedFillerWords.split(/[,\s]+/);
+    console.log(fillerWordsArray)
     const highlightedTexts = transcriptions.map((transcription, transIndex) => {
       const words = transcription.split(/\s+/);
-    
-      return words.map((word, wordIndex) =>
-        userDefinedFillerWords.includes(word.toLowerCase()) ? (
-          <span key={`${transIndex}-${wordIndex}`} style={{ color: "red", fontWeight: "bold" }}>
+      return words.map((word, wordIndex) => {
+        const lowercaseWord = word.toLowerCase();
+        const isFillerWord = fillerWordsArray.includes(lowercaseWord);
+  
+        return (
+          <span key={`${transIndex}-${wordIndex}`} style={{ color: isFillerWord ? "red" : "", fontWeight: isFillerWord ? "bold" : "normal" }}>
             {word}&nbsp;
           </span>
-        ) : (
-          <span key={`${transIndex}-${wordIndex}`}>{word}&nbsp;</span>
-        )
-      );
+        );
+      });
     });
 
     setHighlightedTranscriptions(highlightedTexts);
@@ -41,12 +43,13 @@ const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
     let totalFillerWordsCount = 0;
     let allConfidencesSum = 0;
     let confidencesCount = 0;
+    const fillerWordsArray = userDefinedFillerWords.split(/[,\s]+/);
   
     const scores = transcriptions.map((transcription) => {
       const words = transcription.split(/\s+/).filter((word) => word !== ''); // Exclude empty strings
       const totalWords = words.length;
       const fillerCount = words.filter((word) =>
-        userDefinedFillerWords.includes(word.toLowerCase())
+        fillerWordsArray.includes(word.toLowerCase())
       ).length;
   
       totalWordsCount += totalWords;
