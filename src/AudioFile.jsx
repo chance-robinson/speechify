@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./AudioFile.css";
 
-const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences, infinitePlay }) => {
-  const [isRecording, setIsRecording] = useState(false);
+const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences, infinitePlay, isRecording, setIsRecording }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioURL, setAudioURL] = useState("");
   const [recordingDuration, setRecordingDuration] = useState(0);

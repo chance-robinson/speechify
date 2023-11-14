@@ -14,6 +14,8 @@ function App() {
   });
   const [transcriptions, setTranscriptions] = useState([]);
   const [confidences, setConfidences] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
+
 
   const clearPrompt = () => {
     setPrompt("");
@@ -60,6 +62,8 @@ function App() {
           setTranscriptions={setTranscriptions}
           setConfidences={setConfidences}
           infinitePlay={!useMaxDuration}
+          isRecording={isRecording}
+          setIsRecording={setIsRecording}
         />
         <div className="prompt-container">
           <label className="prompt-label">
@@ -126,6 +130,7 @@ function App() {
         <FillerWordsHighlighter
           transcriptions={transcriptions}
           confidences={confidences}
+          finished={isRecording}
         />
       </div>
     </div>

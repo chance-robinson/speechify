@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
+const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
   const [highlightedTranscriptions, setHighlightedTranscriptions] = useState([]);
   const [fillerScores, setFillerScores] = useState([]);
   const [totalWords, setTotalWords] = useState(0);
@@ -11,6 +11,7 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
     const storedValue = localStorage.getItem("userDefinedFillerWords");
     return storedValue ? storedValue : "um, like, so, yeah";
   });
+  const [waitFinish, setWaitFinish] = useState(false);
 
   useEffect(() => {
     highlightFillerWords(transcriptions);
@@ -70,7 +71,6 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
   
     setFillerScores(scores.map((score) => score.toFixed(2)));
   };
-  
 
   const handleUserDefinedFillerWordsChange = (event) => {
     const newValue = event.target.value;
@@ -104,6 +104,14 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
       <p>
   Average confidence: {isNaN(avgConfidences) ? '' : (avgConfidences*100).toFixed(1)}%
 </p>
+<label>
+        Transcription after recording (not during):
+        <input
+          type="checkbox"
+          checked={waitFinish}
+          onChange={() => setWaitFinish(!waitFinish)}
+        />
+      </label>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr style={{ borderBottom: "2px solid #333" }}>
@@ -119,17 +127,17 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
           </tr>
         </thead>
         <tbody>
-          {transcriptions.map((_, index) => (
-            <tr key={index} style={{ borderBottom: "1px solid #ccc" }}>
-              <td style={{ padding: "10px", wordBreak: 'break-word' }}>
-                {highlightedTranscriptions[index]}
-              </td>
-              <td style={{ padding: "10px" }}>{fillerScores[index]}%</td>
-              <td style={{ padding: "10px" }}>
-                {(confidences[index]* 100).toFixed(1)}%
-              </td>
-            </tr>
-          ))}
+        {(!waitFinish || (waitFinish && !finished)) && transcriptions.map((_, index) => (
+  <tr key={index} style={{ borderBottom: "1px solid #ccc" }}>
+    <td style={{ padding: "10px", wordBreak: 'break-word' }}>
+      {highlightedTranscriptions[index]}
+    </td>
+    <td style={{ padding: "10px" }}>{fillerScores[index]}%</td>
+    <td style={{ padding: "10px" }}>
+      {(confidences[index] * 100).toFixed(1)}%
+    </td>
+  </tr>
+))}
         </tbody>
       </table>
     </div>
