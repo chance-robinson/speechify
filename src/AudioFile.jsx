@@ -121,7 +121,8 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
       audioRef.current.removeEventListener("play", handlePlay);
       audioRef.current.removeEventListener("pause", handlePause);
     };
-  }, []);
+  }, [audioRef.current]);
+
   const pauseRecording = () => {
     if (audioRef.current) {
       audioRef.current.pause();

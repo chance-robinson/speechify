@@ -3,10 +3,13 @@ import React, { useEffect, useState } from "react";
 const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
   const [highlightedTranscriptions, setHighlightedTranscriptions] = useState([]);
   const [fillerScores, setFillerScores] = useState([]);
+  const [totalWords, setTotalWords] = useState(0);
+  const [totalFillerWords, setTotalFillerWords] = useState(0);
+  const [avgConfidences, setAvgConfidences] = useState(0);
   const [userDefinedFillerWords, setUserDefinedFillerWords] = useState(() => {
     // Initialize with the value from local storage, or a default value if not present
     const storedValue = localStorage.getItem("userDefinedFillerWords");
-    return storedValue ? storedValue : "okay";
+    return storedValue ? storedValue : "um, like, so, yeah";
   });
 
   useEffect(() => {
@@ -15,16 +18,16 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
   }, [transcriptions, userDefinedFillerWords]);
 
   const highlightFillerWords = (transcriptions) => {
-    const highlightedTexts = transcriptions.map((transcription) => {
+    const highlightedTexts = transcriptions.map((transcription, transIndex) => {
       const words = transcription.split(/\s+/);
-
-      return words.map((word) =>
+    
+      return words.map((word, wordIndex) =>
         userDefinedFillerWords.includes(word.toLowerCase()) ? (
-          <span key={word} style={{ color: "red", fontWeight: "bold" }}>
+          <span key={`${transIndex}-${wordIndex}`} style={{ color: "red", fontWeight: "bold" }}>
             {word}&nbsp;
           </span>
         ) : (
-          <span key={word}>{word}&nbsp;</span>
+          <span key={`${transIndex}-${wordIndex}`}>{word}&nbsp;</span>
         )
       );
     });
@@ -33,18 +36,41 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
   };
 
   const calculateFillerScores = (transcriptions) => {
+    let totalWordsCount = 0;
+    let totalFillerWordsCount = 0;
+    let allConfidencesSum = 0;
+    let confidencesCount = 0;
+  
     const scores = transcriptions.map((transcription) => {
-      const words = transcription.split(/\s+/);
+      const words = transcription.split(/\s+/).filter((word) => word !== ''); // Exclude empty strings
       const totalWords = words.length;
       const fillerCount = words.filter((word) =>
         userDefinedFillerWords.includes(word.toLowerCase())
       ).length;
-
-      return 100 - (fillerCount / totalWords) * 100;
+  
+      totalWordsCount += totalWords;
+      totalFillerWordsCount += fillerCount;
+  
+      const confidence = confidences[transcriptions.indexOf(transcription)];
+      if (!isNaN(confidence)) {
+        confidencesCount++;
+        allConfidencesSum += confidence;
+      }
+  
+      if (fillerCount === 0) {
+        return 100;
+      } else {
+        return 100 - (fillerCount / totalWords) * 100;
+      }
     });
-
+  
+    setTotalWords(totalWordsCount);
+    setTotalFillerWords(totalFillerWordsCount);
+    setAvgConfidences(allConfidencesSum / confidencesCount); // Calculate average confidence
+  
     setFillerScores(scores.map((score) => score.toFixed(2)));
   };
+  
 
   const handleUserDefinedFillerWordsChange = (event) => {
     const newValue = event.target.value;
@@ -66,6 +92,7 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
           type="text"
           value={userDefinedFillerWords}
           onChange={handleUserDefinedFillerWordsChange}
+          placeholder="don't forget to add commonly used filler words like 'um, yeah, so', etc..."
         />
       </label>
       <p>
@@ -73,6 +100,10 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
         speech patterns such as mumbling/poor enunciation/etc... and will skew
         the transcription.
       </p>
+      <p>Total score: {totalWords === 0 ? '' : totalFillerWords === 0 ? 100 : (100 - (totalFillerWords / totalWords) * 100).toFixed(1)}%</p>
+      <p>
+  Average confidence: {isNaN(avgConfidences) ? '' : (avgConfidences*100).toFixed(1)}%
+</p>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr style={{ borderBottom: "2px solid #333" }}>
@@ -90,12 +121,12 @@ const FillerWordsHighlighter = ({ transcriptions, confidences }) => {
         <tbody>
           {transcriptions.map((_, index) => (
             <tr key={index} style={{ borderBottom: "1px solid #ccc" }}>
-              <td style={{ padding: "10px" }}>
+              <td style={{ padding: "10px", wordBreak: 'break-word' }}>
                 {highlightedTranscriptions[index]}
               </td>
               <td style={{ padding: "10px" }}>{fillerScores[index]}%</td>
               <td style={{ padding: "10px" }}>
-                {confidences[index].toFixed(4) * 100}%
+                {(confidences[index]* 100).toFixed(1)}%
               </td>
             </tr>
           ))}

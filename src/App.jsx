@@ -50,7 +50,7 @@ function App() {
         />
         <div className="prompt-container">
           <label className="prompt-label">
-            <div className='prompt-header' style={{display: 'flex', justifyContent: 'space-between'}}>
+            <div className='prompt-header' style={{display: 'flex', justifyContent: 'space-between', marginTop: '1rem', marginBottom: '1rem'}}>
 
             <p>Prompts:</p>
             <button onClick={clearPrompt} style={{ marginLeft: '10px' }}>
