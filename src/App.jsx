@@ -52,7 +52,7 @@ function App() {
           <label className="prompt-label">
             <div className='prompt-header' style={{display: 'flex', justifyContent: 'space-between'}}>
 
-            <p>Prompt (For reminder):</p>
+            <p>Prompts:</p>
             <button onClick={clearPrompt} style={{ marginLeft: '10px' }}>
                 Clear Prompts
               </button>
@@ -62,6 +62,8 @@ function App() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={calculateRows(prompt)}
+              placeholder="put some prompts to practice on in here"
+              style={{ resize: "vertical" }}
             />
           </label>
         </div>
