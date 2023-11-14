@@ -6,6 +6,7 @@ import './App.css';
 function App() {
   // State to store the max recording duration, prompt, transcriptions, and confidences
   const [maxDuration, setMaxDuration] = useState(60); // Default to 60 seconds, for example
+  const [useMaxDuration, setUseMaxDuration] = useState(false);
   const [prompt, setPrompt] = useState(() => {
     // Initialize with the value from local storage, or an empty string if not present
     const storedPrompt = localStorage.getItem('prompt');
@@ -32,7 +33,7 @@ function App() {
   return (
     <div className='home'>
       <div className="container">
-        <div className="duration-container">
+      <div className="duration-container">
           <label className="duration-label">
             Max Recording Duration (seconds):
             <input
@@ -40,20 +41,30 @@ function App() {
               type="number"
               value={maxDuration}
               onChange={(e) => setMaxDuration(parseInt(e.target.value, 10))}
+              disabled={!useMaxDuration}
+            />
+          </label>
+          <label className="duration-label">
+            <input
+              className="duration-input"
+              type="checkbox"
+              checked={useMaxDuration}
+              onChange={() => setUseMaxDuration(!useMaxDuration)}
             />
           </label>
         </div>
         <AudioRecorder
-          maxRecordingDuration={maxDuration * 1000 + 100}
+          maxRecordingDuration={useMaxDuration ? maxDuration * 1000 + 100 : Infinity}
           setTranscriptions={setTranscriptions}
           setConfidences={setConfidences}
+          infinitePlay={!useMaxDuration}
         />
         <div className="prompt-container">
           <label className="prompt-label">
             <div className='prompt-header' style={{display: 'flex', justifyContent: 'space-between', marginTop: '1rem', marginBottom: '1rem'}}>
 
             <p>Prompts:</p>
-            <button onClick={clearPrompt} style={{ marginLeft: '10px' }}>
+            <button onClick={clearPrompt} style={{ marginLeft: '10px' }} disabled={!prompt}>
                 Clear Prompts
               </button>
             </div>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./AudioFile.css";
 
-const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences }) => {
+const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences, infinitePlay }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioURL, setAudioURL] = useState("");
@@ -24,7 +24,7 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
     if (isRecording) {
       timer = setInterval(() => {
         setRecordingDuration((prevDuration) => prevDuration + 1000); // increment by 100 milliseconds
-        if (recordingDuration >= maxRecordingDuration) {
+        if (recordingDuration >= maxRecordingDuration  && !infinitePlay) {
           stopRecording();
         }
       }, 1000);
@@ -33,7 +33,8 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
     }
 
     return () => clearInterval(timer);
-  }, [isRecording, recordingDuration, maxRecordingDuration]);
+  }, [isRecording, recordingDuration, maxRecordingDuration, infinitePlay]);
+
 
   const startRecording = () => {
     clearContentHandler();
@@ -73,11 +74,12 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
         mediaRecorderRef.current = mediaRecorder;
 
         // Set up a timer to stop recording after maxRecordingDuration milliseconds
+        if (!infinitePlay) {
         recordingTimerRef.current = setTimeout(() => {
           recognition.stop();
           stopRecording();
         }, maxRecordingDuration);
-
+      }
         mediaRecorder.start();
         setIsRecording(true);
       })
