@@ -92,7 +92,7 @@ function App() {
           </label>
         </div>
         <div className="bottom-container">
-        <div className="known-issues">
+        <div>
           <p>Known issues:</p>
           <ul>
             <li>
@@ -104,11 +104,20 @@ function App() {
             <li>no form id's</li>
           </ul>
         </div>
-        <div className="future-additions">
+        <div>
           <p>Will add:</p>
           <ul>
             <li>light/dark theme</li>
             <li>time stamps for each sentence (start/stop)</li>
+          </ul>
+        </div>
+        <div>
+          <p>future plans:</p>
+          <ul>
+            <li>add global prompts for questions/ pages for subjects with questions</li>
+            <li>allow people to listen to other peoples responses, give feedback, rate response</li>
+            <li>accounts with leaderboards/score</li>
+            <li>share screen capability? / embedded facecam?</li>
           </ul>
         </div>
       </div>
