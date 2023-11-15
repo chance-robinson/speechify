@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./AudioFile.css";
 
-const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences, infinitePlay, isRecording, setIsRecording }) => {
+const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences, infinitePlay, isRecording, setIsRecording, setTimeSeries }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioURL, setAudioURL] = useState("");
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -10,10 +10,13 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
   const audioRef = useRef();
   const recordingTimerRef = useRef(null);
   const recognitionRef = useRef(null);
+  const timerValueRef = useRef(0);
+  const startTimeRef = useRef(0);
 
   const clearContentHandler = () => {
     setTranscriptions([]);
     setConfidences([]);
+    setTimeSeries([]);
     setAudioURL("");
     setIsPlaying(false);
   };
@@ -22,8 +25,11 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
     let timer;
     if (isRecording) {
       timer = setInterval(() => {
-        setRecordingDuration((prevDuration) => prevDuration + 1000); // increment by 100 milliseconds
-        if (recordingDuration >= maxRecordingDuration  && !infinitePlay) {
+        setRecordingDuration((prevDuration) => {
+          timerValueRef.current = prevDuration + 1000; // store the current timer value in the ref
+          return timerValueRef.current;
+        });
+        if (timerValueRef.current >= maxRecordingDuration && !infinitePlay) {
           stopRecording();
         }
       }, 1000);
@@ -32,18 +38,22 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
     }
 
     return () => clearInterval(timer);
-  }, [isRecording, recordingDuration, maxRecordingDuration, infinitePlay]);
+  }, [isRecording, maxRecordingDuration, infinitePlay]);
 
 
   const startRecording = () => {
     clearContentHandler();
     const recognition = new window.webkitSpeechRecognition();
     recognition.continuous = true;
-
+    startTimeRef.current = 0;
     recognition.onresult = (event) => {
       const lastIndex = event.results.length - 1;
       const transcript = event.results[lastIndex][0].transcript;
       const conf = event.results[lastIndex][0].confidence;
+      const started = startTimeRef.current;
+      startTimeRef.current = timerValueRef.current/1000;
+      const ended = startTimeRef.current;
+      setTimeSeries((prevTimeSeries) => [...prevTimeSeries, [started, ended]]);
       setTranscriptions((prevTranscriptions) => [...prevTranscriptions, transcript]);
       setConfidences((prevConfidences) => [...prevConfidences, conf]);
     };

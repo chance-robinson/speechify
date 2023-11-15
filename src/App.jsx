@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AudioRecorder from "./AudioFile";
 import FillerWordsHighlighter from "./FillerWordsHighlighter";
 import "./App.css";
+import TimeSeriesPlot from "./TimeSeriesPlot";
 
 function App() {
   // State to store the max recording duration, prompt, transcriptions, and confidences
@@ -15,6 +16,8 @@ function App() {
   const [transcriptions, setTranscriptions] = useState([]);
   const [confidences, setConfidences] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [timeSeries, setTimeSeries] = useState([]);
+  const [fillerScores, setFillerScores] = useState([]);
 
 
   const clearPrompt = () => {
@@ -64,6 +67,7 @@ function App() {
           infinitePlay={!useMaxDuration}
           isRecording={isRecording}
           setIsRecording={setIsRecording}
+          setTimeSeries={setTimeSeries}
         />
         <div className="prompt-container">
           <label className="prompt-label">
@@ -123,10 +127,19 @@ function App() {
       </div>
       </div>
       <div className="container">
+        {/* add New component here that takes in the same props as the one below then uses recharts */}
+        <TimeSeriesPlot 
+                  finished={isRecording}
+                  fillerScores={fillerScores}
+                  timeSeries={timeSeries}
+        />
         <FillerWordsHighlighter
           transcriptions={transcriptions}
           confidences={confidences}
           finished={isRecording}
+          timeSeries={timeSeries}
+          fillerScores={fillerScores}
+          setFillerScores={setFillerScores}
         />
       </div>
     </div>

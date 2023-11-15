@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
+const FillerWordsHighlighter = ({ transcriptions, confidences, finished, timeSeries, fillerScores, setFillerScores }) => {
   const [highlightedTranscriptions, setHighlightedTranscriptions] = useState([]);
-  const [fillerScores, setFillerScores] = useState([]);
   const [totalWords, setTotalWords] = useState(0);
   const [totalFillerWords, setTotalFillerWords] = useState(0);
   const [avgConfidences, setAvgConfidences] = useState(0);
@@ -20,7 +19,6 @@ const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
 
   const highlightFillerWords = (transcriptions) => {
     const fillerWordsArray = userDefinedFillerWords.split(/[,\s]+/);
-    console.log(fillerWordsArray)
     const highlightedTexts = transcriptions.map((transcription, transIndex) => {
       const words = transcription.split(/\s+/);
       return words.map((word, wordIndex) => {
@@ -103,7 +101,7 @@ const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
         speech patterns such as mumbling/poor enunciation/etc... and will skew
         the transcription.
       </p>
-      <p>Total score: {totalWords === 0 ? '' : totalFillerWords === 0 ? 100 : (100 - (totalFillerWords / totalWords) * 100).toFixed(1)}%</p>
+      <p>Percent of words spoken that aren't filler: {totalWords === 0 ? '' : totalFillerWords === 0 ? 100 : (100 - (totalFillerWords / totalWords) * 100).toFixed(1)}%</p>
       <p>
   Average confidence: {isNaN(avgConfidences) ? '' : (avgConfidences*100).toFixed(1)}%
 </p>
@@ -118,7 +116,13 @@ const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr style={{ borderBottom: "2px solid #333" }}>
-            <th style={{ padding: "10px", textAlign: "left", width: "80%" }}>
+          <th style={{ padding: "10px", textAlign: "left", width: "10%" }}>
+              Start
+            </th>
+            <th style={{ padding: "10px", textAlign: "left", width: "10%" }}>
+              Stop
+            </th>
+            <th style={{ padding: "10px", textAlign: "left", width: "60%" }}>
               Sentence
             </th>
             <th style={{ padding: "10px", textAlign: "left", width: "10%" }}>
@@ -132,6 +136,12 @@ const FillerWordsHighlighter = ({ transcriptions, confidences, finished }) => {
         <tbody>
         {(!waitFinish || (waitFinish && !finished)) && transcriptions.map((_, index) => (
   <tr key={index} style={{ borderBottom: "1px solid #ccc" }}>
+    <td style={{ padding: "10px", wordBreak: 'break-word' }}>
+      {timeSeries[index][0]}
+    </td>
+    <td style={{ padding: "10px", wordBreak: 'break-word' }}>
+      {timeSeries[index][1]}
+    </td>
     <td style={{ padding: "10px", wordBreak: 'break-word' }}>
       {highlightedTranscriptions[index]}
     </td>
