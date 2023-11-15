@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   LineChart,
   Line,
@@ -7,6 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
 
 const TimeSeriesPlot = ({ finished, fillerScores, timeSeries }) => {
@@ -20,12 +21,20 @@ const TimeSeriesPlot = ({ finished, fillerScores, timeSeries }) => {
       const xValue = i;
       sum += yValue !== undefined ? parseFloat(yValue) : 0;
       const avg = sum / (xValue + 1);
-      chartData.push({ x: xValue, y: yValue !== undefined ? parseFloat(yValue) : 0, avg });
-  
+      chartData.push({
+        x: xValue,
+        y: yValue !== undefined ? parseFloat(yValue) : 0,
+        avg,
+      });
+
       if (index === array.length - 1 && i === end - 1) {
         sum += yValue !== undefined ? parseFloat(yValue) : 0;
-        const avg = sum / (end+1);
-        chartData.push({ x: xValue+1, y: yValue !== undefined ? parseFloat(yValue) : 0, avg });
+        const avg = sum / (end + 1);
+        chartData.push({
+          x: xValue + 1,
+          y: yValue !== undefined ? parseFloat(yValue) : 0,
+          avg,
+        });
       }
     }
   });
@@ -36,28 +45,40 @@ const TimeSeriesPlot = ({ finished, fillerScores, timeSeries }) => {
 
   return (
     <>
-    <label>
-        Transcription after recording (not during):
+      <label>
+        Plot after recording (not during):
         <input
           type="checkbox"
           checked={waitFinish}
           onChange={() => setWaitFinish(!waitFinish)}
         />
       </label>
-      {(!waitFinish || (waitFinish && !finished)) &&  (<LineChart
-        width={600}
-        height={300}
-        data={chartData}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="x" />
-        <YAxis />
-        <Tooltip formatter={tooltipFormatter} />
-        <Legend />
-        <Line type="monotone" dataKey="y" stroke="#8884d8" name="Score at Time" />
-        <Line type="monotone" dataKey="avg" stroke="#82ca9d" name="Score over Time" />
-      </LineChart>)}
+      {(!waitFinish || (waitFinish && !finished)) && (
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="x" />
+            <YAxis />
+            <Tooltip formatter={tooltipFormatter} />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="y"
+              stroke="#8884d8"
+              name="Score at Time"
+            />
+            <Line
+              type="monotone"
+              dataKey="avg"
+              stroke="#82ca9d"
+              name="Score over Time"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </>
   );
 };

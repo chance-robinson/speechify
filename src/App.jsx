@@ -4,6 +4,30 @@ import FillerWordsHighlighter from "./FillerWordsHighlighter";
 import "./App.css";
 import TimeSeriesPlot from "./TimeSeriesPlot";
 
+const ExpandableList = ({ title, items }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div>
+      <div onClick={() => setIsExpanded(!isExpanded)} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} className={`expandable-list ${isExpanded ? "expanded" : ""}`}>
+      <p>
+        {title}
+      </p>
+      <p>
+      {isExpanded ? "-" : "+"}
+      </p>
+      </div>
+      {isExpanded && (
+        <ul>
+          {items.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 function App() {
   // State to store the max recording duration, prompt, transcriptions, and confidences
   const [maxDuration, setMaxDuration] = useState(60); // Default to 60 seconds, for example
@@ -100,31 +124,29 @@ function App() {
           </label>
         </div>
         <div className="bottom-container">
-        <div>
-          <p>Known issues:</p>
-          <ul>
-            <li>awkward button styling on clear prompts if hovering</li>
-            <li>need word break on user-defined filler words</li>
-            <li>no form id's</li>
-          </ul>
-        </div>
-        <div>
-          <p>Will add:</p>
-          <ul>
-            <li>light/dark theme</li>
-            <li>time stamps for each sentence (start/stop)</li>
-          </ul>
-        </div>
-        <div>
-          <p>future plans:</p>
-          <ul>
-            <li>add global prompts for questions/ pages for subjects with questions</li>
-            <li>allow people to listen to other peoples responses, give feedback, rate response</li>
-            <li>accounts with leaderboards/score</li>
-            <li>share screen capability? / embedded facecam?</li>
-          </ul>
-        </div>
-      </div>
+          <div style={{textAlign: 'center', fontSize: '1.5rem'}}>ROADMAP (click to expand)</div>
+      <ExpandableList
+        title="Known issues:"
+        items={[
+          "awkward button styling on clear prompts if hovering",
+          "need word break on user-defined filler words",
+          "no form id's",
+        ]}
+      />
+      <ExpandableList
+        title="Will add:"
+        items={["light/dark theme", "time stamps for each sentence (start/stop)"]}
+      />
+      <ExpandableList
+        title="Future plans:"
+        items={[
+          "add global prompts for questions/pages for subjects with questions",
+          "allow people to listen to other people's responses, give feedback, rate response",
+          "accounts with leaderboards/score",
+          "share screen capability? / embedded facecam?",
+        ]}
+      />
+    </div>
       </div>
       <div className="container">
         {/* add New component here that takes in the same props as the one below then uses recharts */}

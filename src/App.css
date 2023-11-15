@@ -11,7 +11,6 @@ body {
     flex-direction: row;
     margin: 0 auto;
     height: 100vh;
-
 }
 
 .container {
@@ -78,4 +77,32 @@ button:disabled {
 
 .bottom-container {
   margin-top: auto;
+}
+
+@media screen and (max-width: 900px) {
+  .home {
+    flex-direction: column;
+    height: 100vh;
+    max-width: 100%;
+}
+
+.container {
+  width: 90%;
+  margin: 0 auto;
+}
+}
+
+.expandable-list {
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+.expandable-list:hover {
+  background-color: gray;
+}
+
+.expandable-list li {
+  margin-bottom: 5px;
 }
