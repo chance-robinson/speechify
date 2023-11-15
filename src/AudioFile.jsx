@@ -87,13 +87,19 @@ const AudioRecorder = ({ maxRecordingDuration, setTranscriptions, setConfidences
 
   const stopRecording = () => {
     if (recognitionRef.current) {
-      recognitionRef.current.stop(); // Call stop on the stored recognition object
+      recognitionRef.current.stop();
     }
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      setRecordingDuration(0); // Reset duration when recording stops
+      setRecordingDuration(0);
       clearTimeout(recordingTimerRef.current);
+  
+      // Release the media stream tracks
+      const stream = mediaRecorderRef.current.stream;
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
     }
   };
 
